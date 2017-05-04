@@ -2,7 +2,12 @@
 #include <cmath>
 
 using namespace cv;
+using namespace std;
+
+void removeGrey(Mat *sup, int x, int y);
 float pi = 3.141592654;
+int wl = 60;
+int bl = 10;
 
 int main(int arg) {
 
@@ -81,6 +86,20 @@ int main(int arg) {
 		x++;
 		y = 1;
 	}
+	x = 1;
+	while (x < cols - 1) {
+		
+		while (y < rows - 1) {
+			float lux = sup.at<float>(y, x);
+			if (lux >= wl) {
+				removeGrey(&sup, y, x);
+			}
+			y++;
+		}
+		x++;
+		y = 1;
+	}
+	
 	imwrite("imageInput.jpg", imgIn);
 	imwrite("mag.jpg", mag);
 	imwrite("xCor.jpg", xCor);
@@ -88,4 +107,33 @@ int main(int arg) {
 	imwrite("angle.jpg", angle);
 	imwrite("SupressedImage.jpg", sup);
 	return 0;
+}
+
+void removeGrey(Mat *sup, int x, int y) {
+	cout << x << ',' << y << endl;
+	sup[0].at<float>(x, y) = 0xffff;
+	if ((sup[0].at<float>(x - 1, y - 1) > bl) && (sup[0].at<float>(x - 1, y - 1) < wl)) {
+		removeGrey(sup, x - 1, y - 1);
+	}
+	else if ((sup[0].at<float>(x, y - 1) > bl) && (sup[0].at<float>(x, y - 1) < wl)) {
+		removeGrey(sup, x, y - 1);
+	}
+	else if ((sup[0].at<float>(x + 1, y - 1) > bl) && (sup[0].at<float>(x + 1, y - 1) < wl)) {
+		removeGrey(sup, x + 1, y - 1);
+	}
+	else if ((sup[0].at<float>(x + 1, y) > bl) && (sup[0].at<float>(x + 1, y) < wl)) {
+		removeGrey(sup, x + 1, y);
+	}
+	else if ((sup[0].at<float>(x + 1, y + 1) > bl) && (sup[0].at<float>(x + 1, y + 1) < wl)) {
+		removeGrey(sup, x + 1, y + 1);
+	}
+	else if ((sup[0].at<float>(x, y + 1) > bl) && (sup[0].at<float>(x, y + 1) < wl)) {
+		removeGrey(sup, x, y + 1);
+	}
+	else if ((sup[0].at<float>(x - 1, y + 1) > bl) && (sup[0].at<float>(x - 1, y + 1) < wl)) {
+		removeGrey(sup, x - 1, y + 1);
+	}
+	else if ((sup[0].at<float>(x - 1, y) > bl) && (sup[0].at<float>(x - 1, y) < wl)) {
+		removeGrey(sup, x - 1, y);
+	}
 }
