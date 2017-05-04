@@ -5,13 +5,13 @@ using namespace cv;
 using namespace std;
 
 void removeGrey(Mat *sup, int x, int y);
-float pi = 3.141592654;
-int wl = 60;
-int bl = 10;
+float pi = 3.1415926535897;
+int wl = 70;
+int bl = 20;
 
 int main(int arg) {
 
-	Mat imgIn, imgOut, pic, yCor, xCor, mag, angle, sup;
+	Mat imgIn, imgOut, pic, yCor, xCor, mag, angle, sup, fin;
 	imgIn = imread("Image1.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	if (imgIn.empty()) return -1;
 	imgOut = Mat(imgIn.rows, imgIn.cols, CV_32F);
@@ -20,6 +20,7 @@ int main(int arg) {
 	mag = Mat(imgIn.rows, imgIn.cols, CV_32F);
 	angle = Mat(imgIn.rows, imgIn.cols, CV_32F);
 	sup = Mat(imgIn.rows, imgIn.cols, CV_32F);
+	fin = Mat(imgIn.rows, imgIn.cols, CV_32F);
 	GaussianBlur(imgIn, imgOut, Size(5, 5), 0, 0);
 	imgOut.convertTo(imgOut, CV_32F);
 	
@@ -99,18 +100,30 @@ int main(int arg) {
 		x++;
 		y = 1;
 	}
-	
+	x = 1;
+	while (x < cols - 1) {
+
+		while (y < rows - 1) {
+			float lux = sup.at<float>(y, x);
+			if (lux == 0xffff) {
+				fin.at<float>(y, x) = lux;
+			}
+			y++;
+		}
+		x++;
+		y = 1;
+	}
 	imwrite("imageInput.jpg", imgIn);
 	imwrite("mag.jpg", mag);
 	imwrite("xCor.jpg", xCor);
 	imwrite("YCorr.jpg", yCor);
 	imwrite("angle.jpg", angle);
 	imwrite("SupressedImage.jpg", sup);
+	imwrite("FinalOutput.jpg", fin);
 	return 0;
 }
 
 void removeGrey(Mat *sup, int x, int y) {
-	cout << x << ',' << y << endl;
 	sup[0].at<float>(x, y) = 0xffff;
 	if ((sup[0].at<float>(x - 1, y - 1) > bl) && (sup[0].at<float>(x - 1, y - 1) < wl)) {
 		removeGrey(sup, x - 1, y - 1);
